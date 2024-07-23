@@ -20,6 +20,8 @@ from ..icl_retriever import BaseRetriever
 from ..utils.logging import get_logger
 from .icl_base_inferencer import BaseInferencer, GenInferencerOutputHandler
 
+from ...utils import record_expert_select
+
 logger = get_logger(__name__)
 
 
@@ -92,6 +94,8 @@ class GenInferencer(BaseInferencer):
             output_json_filepath = self.output_json_filepath
         if output_json_filename is None:
             output_json_filename = self.output_json_filename
+
+        record_expert_select.set_output_file_path(output_json_filepath.replace('predictions', 'expert_select'), output_json_filename)
 
         # 2. Get results of retrieval process
         ice_idx_list = retriever.retrieve()
@@ -177,6 +181,7 @@ class GenInferencer(BaseInferencer):
         end_time_stamp = time.time()
 
         # 6. Output
+        record_expert_select.dump_result()
         if self.is_main_process:
             os.makedirs(output_json_filepath, exist_ok=True)
             output_handler.write_to_json(output_json_filepath,
