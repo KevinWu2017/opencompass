@@ -27,7 +27,7 @@ def set_output_file_path(filepath, filename):
     print("Recording expert select results to ", output_path, output_file)
     os.makedirs(output_path, exist_ok=True)
 
-def record_expert_select_result(layer_idx, tensor):
+def record_one_layer(layer_idx, tensor):
     if begin_recording:
         global batch_dict
 
@@ -40,7 +40,7 @@ def record_expert_select_result(layer_idx, tensor):
 
         batch_dict[str(layer_idx)] = filename
 
-def record_expert_select_result_dict():
+def store_one_iter():
     if begin_recording:
         global result_list
         global batch_dict
