@@ -139,6 +139,7 @@ class GenInferencer(BaseInferencer):
         start_time_stamp = time.time()
         num_sample = 0
         for datum in tqdm(dataloader, disable=not self.is_main_process):
+            # print("================= One Batch Samples ",  len(datum), " =================")
             if ds_reader.output_column:
                 entry, golds = list(zip(*datum))
             else:
@@ -151,6 +152,9 @@ class GenInferencer(BaseInferencer):
                 extra_gen_kwargs['stopping_criteria'] = self.stopping_criteria
             if 'min_out_len' in sig.parameters:
                 extra_gen_kwargs['min_out_len'] = self.min_out_len
+
+            record_expert_select.start_one_batch(len(datum))
+
             with torch.no_grad():
                 parsed_entries = self.model.parse_template(entry, mode='gen')
                 results = self.model.generate_from_template(
@@ -177,6 +181,8 @@ class GenInferencer(BaseInferencer):
                 output_handler.write_to_json(output_json_filepath,
                                              'tmp_' + output_json_filename)
             num_sample += len(datum)
+
+            record_expert_select.store_one_batch()
 
         end_time_stamp = time.time()
 
